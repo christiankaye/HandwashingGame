@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CNA Skills Simulation Game</title>
+    <style>
+        .intro-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 1;
+            transition: opacity 0.5s ease;
+        }
+
+        .intro-screen {
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .intro-features {
+            display: flex;
+            gap: 2rem;
+            justify-content: center;
+            margin: 2rem 0;
+        }
+
+        .intro-text {
+            font-size: 1.2em;
+            color: #2c3e50;
+            margin: 20px auto;
+            max-width: 600px;
+            line-height: 1.6;
+        }
+
+        .intro-highlight {
+            font-size: 1.3em;
+            color: #3498db;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+
+        .intro-title {
+            color: #2c3e50;
+            font-size: 2.5em;
+            margin-bottom: 20px;
+        }
+
+
+        .feature {
+            text-align: center;
+        }
+
+        .feature-icon {
+            font-size: 2.5em;
+        }
+
+        #startButton {
+            background: var(--secondary-color);
+            color: white;
+        }
+
+        :root {
+            --secondary-color: #2ecc71;
+        }
+
+        .start-game-btn {
+            padding: 1rem 2rem;
+            font-size: 1.5em;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .start-game-btn:hover {
+            transform: scale(1.05);
+            background: #2980b9;
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .start-game-btn:active {
+            transform: scale(0.95);
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.9)),
+                        url('hospitalRoom.png');
+            background-size: cover;
+            background-position: center;
+            min-height: 100vh;
+        }
+
+        #mainImage {
+            width: 600px;
+            height: 600px;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            margin: 10px auto;
+            border: 2px solid #3498db;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+        #step {
+            text-align: center;
+            font-size: 16px;
+            color: #2c3e50;
+            margin: 0px 0;
+            font-weight: bold;
+            padding: 2px;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 5px;
+            border: 2px solid #3498db;
+        }
+
+        .game-container {
+            position: relative;
+            width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: rgba(180, 210, 219, 0.4);
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .game-heading {
+            text-align: center;
+            color: #2c3e50;
+            font-family: 'Impact', 'Arial Black', Helvetica, sans-serif;
+            font-size: 32px;
+            font-weight: bold;
+            margin: 10px 0;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .progress-container {
+            width: 100%;
+            height: 20px;
+            background-color: #f0f0f0;
+            border-radius: 10px;
+            margin-top: 20px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            width: 0%;
+            height: 100%;
+            background-color: #3498db;
+            transition: width 0.5s ease-in-out;
+        }
+
+        .steps-dropdown {
+            padding: 10px;
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 16px;
+            border-radius: 5px;
+            border: 2px solid #3498db;
+            cursor: pointer;
+            width: 100%;
+            max-width: 800px;
+        }
+
+        .steps-dropdown option {
+            white-space: normal;
+            word-wrap: break-word;
+            max-width: 800px;
+            padding: 10px;
+            line-height: 1.4;
+        }
+
+        .correct-answer {
+            animation: correctPulse 0.5s ease-in-out;
+        }
+
+        .wrong-answer {
+            animation: wrongShake 0.5s ease-in-out;
+        }
+
+        @keyframes correctPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); background-color: #2ecc71; }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes wrongShake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-10px); background-color: #e74c3c; }
+            75% { transform: translateX(10px); background-color: #e74c3c; }
+            100% { transform: translateX(0); }
+        }
+
+        /* Score display enhancement */
+        #score {
+            border: 2px solid #3498db;
+            padding: 5px 5px;
+            border-radius: 10px;
+            font-size: 1.6em;
+            background-color: white;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            text-align: center;
+            color: #2c3e50;
+            font-weight: bold;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        .score-label {
+            font-size: 0.7em;
+            text-transform: uppercase;
+            color: var(--dark-color);
+            font-weight: bold;
+        }
+
+        .score-value {
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        .score-display {
+            position: fixed;
+            top: 40px;
+            left: 100px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 10px;
+            border: 2px solid #3498db;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 1000;
+        }
+        .start-btn {
+            padding: 10px 20px;
+            background-color: #3498db;
+            padding: 5px 5px;
+            border: 2px solid #000000;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: bold;
+            font-family: Arial, Helvetica, sans-serif;
+            transition: all 0.5s ease;
+            color: white;
+        }
+        .start-btn:hover {
+            transform: scale(1.1);
+            background-color: #27ae60;
+        }
+        .score-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 5px;
+            transition: transform 0.2s;
+        }
+
+        .score-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .steps-menu {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .addNoiseControls-controls {
+            position: fixed;
+            top: 40px;
+            right: 100px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 10px;
+            border: 2px solid #3498db;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 1000;
+        }
+
+        .noise-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 5px;
+            transition: transform 0.2s;
+        }
+
+        .noise-btn:hover {
+            transform: scale(1.1);
+        }
+
+        #volumeSlider {
+            width: 100px;
+            height: 10px;
+            background: #ddd;
+            border-radius: 5px;
+            outline: none;
+        }
+
+        #volumeSlider::-webkit-slider-thumb {
+            width: 15px;
+            height: 15px;
+            background: #4CAF50;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        /* Update the game-controls to include the score */
+        .game-controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 20px 0;
+            gap: 20px;
+        }
+
+        #timer {
+            min-width: 150px;
+            text-align: center;
+        }
+
+        .progress-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .progress-label {
+            font-weight: bold;
+            color: #2c3e50;
+            font-size: 16px;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        .progress-container {
+            flex: 1;
+        }
+
+        #timer {
+            border: 2px solid #3498db;
+            padding: 5px 5px;
+            border-radius: 10px;
+            font-size: 1.6em;
+            background-color: white;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .timer {
+            text-align: center;
+            font-size: 24px;
+            color: #2c3e50;
+            font-weight: bold;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        .timer-label {
+            font-size: 0.7em;
+            text-transform: uppercase;
+            color: var(--dark-color);
+            font-weight: bold;
+        }
+
+        .timer-value {
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+
+        .hint-btn {
+            padding: 5px 10px;
+            background-color: #cef8cc;
+            border: 2px solid #000000;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 24px;
+            font-weight: bold;
+            font-family: Arial, Helvetica, sans-serif;
+            transition: all 0.5s ease;
+        }
+
+        .hint-btn:hover {
+            transform: scale(1.1);
+            background-color: #f39c12;
+        }
+    </style>
+</head>
+<body>
+<!-- Game Introduction Screen -->
+<div class="intro-container" id="introContainer">
+    <div class="intro-screen">
+        <h1 class="intro-title">Hand Hygiene Training</h1>
+        <p class="intro-text">Welcome to Handwashing Hero!</p>
+        <p>Master proper hand hygiene techniques essential for healthcare professionals.</p>
+        <div class="intro-features">
+            <div class="feature">
+                <span class="feature-icon">🎮</span>
+                <p>Master Hand Hygiene</p>
+            </div>
+            <div class="feature">
+                <span class="feature-icon">🏆</span>
+                <p>Earn Points</p>
+            </div>
+            <div class="feature">
+                <span class="feature-icon">⭐</span>
+                <p>Track Progress</p>
+            </div>
+        </div>
+        <p class="intro-highlight">Ready to become a Handwashing Hero?</p>
+        <button class="start-game-btn" onclick="startGame()">Begin Training</button>
+    </div>
+</div>
+<main class="game-container">
+    <main class="game-container">
+        <div class="score-display">
+            <button class="score-btn">
+                <span class="score-icon">🏆 Score</span>
+            </button>
+            <div id="score" class="score">Score: 100</div>
+        </div>        
+        <header>
+            <h1 class="game-heading">Handwashing Hero</h1>
+    </header>
+        <div id="mainImage"></div>
+        <div id="step">Follow the handwashing steps to prevent the spread of germs!</div>
+        <div class="game-controls">
+            
+            <div id="timer" class="timer">Time: 03:00</div>
+            <button id="startButton" class="start-btn">▶️ Start Game</button>
+            <button id="hintButton" class="hint-btn">💡 Hint</button>
+        </div>       
+        <div class="steps-menu">
+                <select id="stepsDropdown" class="steps-dropdown" aria-label="Handwashing Steps">
+                <option value="">Select a step...</option>
+                <option value="step1">Turn on the faucet.</option>
+                <option value="step2">Begin handwashing by wetting hands.</option>
+                <option value="step3">Apply soap from the soap dispenser.</option>
+                <option value="step4">Scrub your hands for at least 20 seconds.</option>
+                <option value="step5">Clean hands thoroughly.</option>
+                <option value="step6">Rinse hands and wrists, removing soap.</option>
+                <option value="step7">Dry hands.</option>
+                <option value="step8">Use a paper towel to turn off the faucet.</option>
+                <option value="step9">Dispose of the paper towel.</option>
+            </select>
+        </div>
+        
+    <div class="progress-wrapper">
+        <div class="progress-label">Progress:</div>
+        <div class="progress-container" role="progressbar" aria-label="Game Progress">
+            <div id="progressBar" class="progress-bar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+        </div>
+    </div>
+</main>
+
+<script src="game.js"></script>
+</body>
+</html>
